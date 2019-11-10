@@ -7,6 +7,8 @@ use App\Http\Service\ServiceInterface\ContractServiceInterface;
 use App\Http\Requests\UserDetailRequest;
 use App\Http\Requests\UserPasswordRequest;
 use App\Http\Service\ServiceInterface\UserServiceInterface;
+use App\Notifications\UserFeedback;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -45,13 +47,26 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = $this->userService->findById($id);
-        return view('users.edit', compact('user'));
+        if($user->name !== $user->password) {
+            return view('users.edit', compact('user'));
+        }
+        else{
+            Session::flash('facebook', 'Bạn không được thay đổi thông tin khi đăng nhập bằng Facebook');
+            return view('users.detail', compact('user'));
+        }
     }
 
     public function changePassword($id)
     {
         $user = $this->userService->findById($id);
-        return view('users.changePassword', compact('user'));
+        if($user->name !== $user->password){
+            return view('users.changePassword', compact('user'));
+        }
+        else{
+            Session::flash('facebook', 'Bạn không được thay đổi mật khẩu khi đăng nhập bằng Facebook');
+            return view('users.detail', compact('user'));
+        }
+
     }
 
     public function update(UserDetailRequest $request, $id)
@@ -74,17 +89,19 @@ class UserController extends Controller
         $feedback->content = $request->contentt;
         $feedback->contract_id = $id;
         $feedback->save();
-        return redirect()->route('userRoute.contractRun');
-        $user = $this->userService->findById($id);
-        if (Hash::check($request->passwordOld, $user->password)){
-            $this->userService->updatePassword($request, $id);
-            return view('users.detail', compact('user'));
-        }
-        else {
-            Session::flash('message', 'Mật khẩu cũ không đúng');
-            return view('users.changePassword', compact('user'));
-        }
 
+        $contract = $this->contractService->findById($id);
+        $admin = User::findorfail(1);
+        $admin->notify(new UserFeedback($contract));
+
+        Session::flash('feedback', 'Bạn gửi phản hồi thành công');
+        return redirect()->route('userRoute.contractRun');
+
+    }
+
+    public function resetPassword(Request $request)
+    {
+        return $this->userService->findByEmail($request->email);
     }
 
 }

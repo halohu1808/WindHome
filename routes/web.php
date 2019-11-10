@@ -65,7 +65,7 @@ Route::group(['prefix' => 'roomUser'], function () {
 });
 
 
-Route::group(['prefix' => 'user'], function () {
+Route::group(['prefix' => 'user', 'middleware' => 'user'], function () {
     Route::get('/edit/{id}', 'UserController@edit')->name('user.edit');
     Route::get('/changePassword/{id}', 'UserController@changePassword')->name('user.changePassword');
     Route::post('/updatePassword/{id}', 'UserController@updatePassword')->name('user.updatePassword');
@@ -76,10 +76,12 @@ Route::group(['prefix' => 'user'], function () {
 
 Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
     Route::get('/', 'AdminController@index')->name('admin.index');
-    Route::get('/detail/{id}', 'AdminController@detail')->name('admin.detail');
+    Route::get('/detail/{id}/{key?}', 'AdminController@detail')->name('admin.detail');
     Route::post('/edit/{id}', 'AdminController@editStatus')->name('admin.editStatus');
     Route::get('/create', 'RoomController@create')->name('room.create');
     Route::post('/create', 'RoomController@store')->name('room.store');
+    Route::get('/cancelCancelRoom/{id}/{key?}', 'AdminController@cancelCancelRoom')->name('admin.cancelCancelRoom');
+    Route::get('/income', 'AdminController@income')->name('admin.income');
 });
 
 Route::group(['prefix' => 'contracts', 'middleware' => 'admin'], function () {
@@ -96,7 +98,8 @@ Route::group(['prefix' => 'contracts', 'middleware' => 'admin'], function () {
 
     //Hai code
     Route::get('/end/{id}', 'ContractController@end')->name('contract.end');
-    Route::get('/cancelEnd/{id}', 'ContractController@cancelEnd')->name('contract.cancelEnd');
+
+    Route::get('/endContractByAdmin/{id}', 'ContractController@cancelEndByAdmin')->name('contract.cancelEndByAdmin');
 });
 
 //User Action - Hải Viết - UserActionController
@@ -125,7 +128,7 @@ Route::group(['prefix' => 'adminRoute', 'middleware' => 'admin'], function () {
     Route::get('/userAll', 'RouterAdminController@userAll')->name('adminRoute.userAll');
 });
 
-Route::group(['prefix' => 'userRoute', 'middleware' => 'login'], function () {
+Route::group(['prefix' => 'userRoute', 'middleware' => 'user'], function () {
 
     Route::get('/userSite', 'RouterUserController@userSite')->name('userRoute.userSite');
     Route::get('/allContract', 'RouterUserController@allContract')->name('userRoute.allContract');
@@ -133,12 +136,11 @@ Route::group(['prefix' => 'userRoute', 'middleware' => 'login'], function () {
     Route::get('/contractKeepRequest', 'RouterUserController@contractKeepRequest')->name('userRoute.contractKeepRequest');
     Route::get('/contractEndRequest', 'RouterUserController@contractEndRequest')->name('userRoute.contractEndRequest');
     Route::get('/contractEnd', 'RouterUserController@contractEnd')->name('userRoute.contractEnd');
-    Route::get('/contractDetail/{id}', 'RouterUserController@contractDetail')->name('userRoute.contractDetail');
+    Route::get('/contractDetail/{id}/{key?}', 'RouterUserController@contractDetail')->name('userRoute.contractDetail');
     Route::get('cancelBookingRequest/{roomId}/{contractId}', 'UserActionController@cancelBookingRequest')->name('UserAction.cancelBookingRequest');
     Route::get('cancelRoom/{roomId}/{contractId}', 'UserActionController@cancelRoom')->name('UserAction.cancelRoom');
+    Route::get('/cancelEnd/{id}', 'ContractController@cancelEnd')->name('contract.cancelEnd');
 
 });
 
-
-
-
+Route::post('/resetPassword', 'UserController@resetPassword')->name('user.resetPassword');

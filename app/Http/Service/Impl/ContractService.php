@@ -37,6 +37,7 @@ class ContractService implements ContractServiceInterface
 //        dd($contract);
 
         $this->contractRepository->save($contract);
+        return $contract;
 
     }
 
@@ -74,7 +75,10 @@ class ContractService implements ContractServiceInterface
     function cancel($id)
     {
         $contract = $this->contractRepository->findByRoomId($id);
+        $userId = $contract[0]->userId;
+
         $contract[0]->delete();
+        return $userId;
     }
 
     public
@@ -86,6 +90,7 @@ class ContractService implements ContractServiceInterface
         $contract[0]->statusId = 6;
         $contract[0]->endTime = $currentTime;
         $this->contractRepository->save($contract[0]);
+        return $contract[0];
     }
 
 //    Hai code
@@ -98,6 +103,7 @@ class ContractService implements ContractServiceInterface
         $contract[0]->statusId = 6;
         $contract[0]->endTime = $currentTime;
         $this->contractRepository->save($contract[0]);
+        return $contract[0];
     }
 
     public
@@ -107,6 +113,7 @@ class ContractService implements ContractServiceInterface
         $contract[0]->statusId = "5";
 //     dd($contract[0]);
         $this->contractRepository->save($contract[0]);
+        return $contract[0];
     }
 
     public function deleteContract($contractId)

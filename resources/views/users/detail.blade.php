@@ -1,8 +1,8 @@
 @extends('layout.home')
 
-@section('sideBar')
-    @include('listSite.filterSideBar')
-@endsection
+{{--@section('sideBar')--}}
+{{--    @include('listSite.filterSideBar')--}}
+{{--@endsection--}}
 
 @section('content')
 
@@ -16,6 +16,12 @@
                 <div class="col-md-12">
                     @if (Session::has('message'))
                         <p class="alert {{ Session::get('alert-class', 'alert-info') }}">{{ Session::get('message') }}</p>
+                    @endif
+
+                </div>
+                <div class="col-md-12">
+                    @if (Session::has('facebook'))
+                        <p class="alert alert-danger {{ Session::get('alert-class', 'alert-info') }}">{{ Session::get('facebook') }}</p>
                     @endif
 
                 </div>
